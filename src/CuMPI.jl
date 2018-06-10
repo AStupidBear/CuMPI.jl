@@ -8,6 +8,7 @@ import MPI: MPI_ALLGATHER, MPI_GATHERV, MPI_ALLGATHERV, MPI_ALLTOALLV
 import MPI: Send, Isend, Recv!, Irecv!, Bcast!, Reduce, 
             Gather, Scatter, Scatterv, Scan, Exscan
 import MPI: Allreduce!, allreduce, Allgather, Gatherv, Allgatherv, Alltoall, Alltoallv
+import MPI: user_op
 
 for fun in [:Send, :Isend, :Recv!, :Irecv!, :Bcast!, :Reduce,
             :Gather, :Scatter, :Scatterv, :Scan, :Exscan]
@@ -34,11 +35,6 @@ end
 
 function Allreduce!(sendbuf::CuArray{T}, recvbuf::CuArray{T}, args...) where T
     Allreduce!(Ptr{T}(sendbuf.buf.ptr), Ptr{T}(recvbuf.buf.ptr), args...)
-end
-
-function Allreduce!(sendbuf::CuArray{T}, recvbuf::CuArray{T},
-                   op::Union{Op,Function}, comm::Comm) where T
-    Allreduce!(sendbuf, recvbuf, length(recvbuf), op, comm)
 end
 
 function Allreduce!(sendbuf::CuArray{T}, recvbuf::CuArray{T},
@@ -98,5 +94,13 @@ function Alltoallv(sendbuf::CuArray{T}, scounts::Vector{Cint}, rcounts::Vector{C
           sendbuf.buf.ptr, scounts, sdispls, &mpitype(T), recvbuf.buf.ptr, rcounts, rdispls, &mpitype(T), &comm.val, &0)
     recvbuf
 end
+
+Allreduce!(sendbuf::CuArray{T}, recvbuf::CuArray{T},
+           count::Integer, opfunc::Function, comm::Comm) where {T} =
+    Allreduce!(sendbuf, recvbuf, count, user_op(opfunc), comm)
+
+Reduce(sendbuf::CuArray{T}, count::Integer,
+       opfunc::Function, root::Integer, comm::Comm) where {T} =
+    Reduce(sendbuf, count, user_op(opfunc), root, comm)
 
 end
