@@ -10,6 +10,8 @@ import MPI: Send, Isend, Recv!, Irecv!, Bcast!, Reduce,
 import MPI: Allreduce!, allreduce, Allgather, Gatherv, Allgatherv, Alltoall, Alltoallv
 import MPI: user_op
 
+include("device.jl")
+
 for fun in [:Send, :Isend, :Recv!, :Irecv!, :Bcast!, :Reduce,
             :Gather, :Scatter, :Scatterv, :Scan, :Exscan]
     @eval function $fun(buf::CuArray{T}, args...) where T
