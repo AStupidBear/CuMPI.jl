@@ -6,7 +6,7 @@ function device!(n)
 end
 
 function Init()
-    MPI.Init()
+    !MPI.Initialized() && MPI.Init()
     rank = MPI.Comm_rank(MPI.COMM_WORLD)
     device!(rank)
 end
