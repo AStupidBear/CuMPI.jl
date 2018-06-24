@@ -1,5 +1,3 @@
-__precompile__(false)
-
 module CuMPI
 
 using MPI, CuArrays
