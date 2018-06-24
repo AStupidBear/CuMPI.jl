@@ -1,5 +1,3 @@
-using CUDAdrv
-
 function device!(n)
     ngpu = length(CUDAdrv.devices())
     CUDAdrv.CuContext(CUDAdrv.CuDevice(mod1(n, ngpu) - 1))
